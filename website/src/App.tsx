@@ -4,7 +4,9 @@ import { Col, Container, Navbar, NavbarBrand, Row } from 'reactstrap';
 
 import './App.css';
 import Create from './Create';
+import CreateFromFile from './CreateFromFile';
 import DisplaySecret from './DisplaySecret';
+import DownloadSecretFile from './DownloadSecretFile';
 
 class App extends React.Component {
   public render() {
@@ -19,13 +21,22 @@ class App extends React.Component {
           <Container className="margin">
             <Row>
               <Col ml="auto">
-                <Route path="/" exact={true} component={Create} />
+                <Route path="/" exact={true}>
+                  <Create />
+                  <CreateFromFile />
+                </Route>
                 <Route
                   exact={true}
                   path="/s/:key/:password"
                   component={DisplaySecret}
                 />
                 <Route exact={true} path="/s/:key" component={DisplaySecret} />
+                <Route
+                  exact={true}
+                  path="/sf/:key/:password"
+                  component={DownloadSecretFile}
+                />
+                <Route exact={true} path="/sf/:key" component={DownloadSecretFile} />
               </Col>
             </Row>
           </Container>
@@ -42,7 +53,6 @@ const Features = () => {
     <Container className="features">
       <hr />
       <p className="lead">
-        {' '}
         Yopass is created to reduce the amount of clear text passwords stored in
         email and chat conversations by encrypting and generating a short lived
         link which can only be viewed once.

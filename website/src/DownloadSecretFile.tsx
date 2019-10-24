@@ -4,10 +4,10 @@ import { Redirect, useParams } from 'react-router-dom';
 import { Button, Col, FormGroup, Input, Label } from 'reactstrap';
 import * as sjcl from 'sjcl';
 
-const DisplaySecret = (props: any & React.HTMLAttributes<HTMLElement>) => {
+const DownloadSecretFile = (props: any & React.HTMLAttributes<HTMLElement>) => {
   const [loading, setLoading] = useState(false);
   const [error, showError] = useState(false);
-  const [secret, setSecret] = useState('');
+  const [secretFile, setSecretFile] = useState('');
   const { key, password } = useParams();
 
   const decrypt = async (pass: string) => {
@@ -19,7 +19,11 @@ const DisplaySecret = (props: any & React.HTMLAttributes<HTMLElement>) => {
       const request = await fetch(`${url}/${key}`);
       if (request.status === 200) {
         const data = await request.json();
-        setSecret(sjcl.decrypt(pass, data.message));
+        const base64decrypt = sjcl.decrypt(pass, data.message);
+        const decrypt = sjcl.codec.base64.toBits(base64decrypt);
+        const byteNumbers = fromBitArrayCodec(decrypt);
+        const byteArray = new Uint8Array(byteNumbers);
+        setSecret(byteArray); //TODO: fix
         setLoading(false);
         return;
       }
@@ -120,4 +124,16 @@ const Secret = (
     </div>
   ) : null;
 
-export default DisplaySecret;
+const fromBitArrayCodec = (arr): Array => {
+    var out = [], bl = sjcl.bitArray.bitLength(arr), i, tmp;
+    for (i=0; i<bl/8; i++) {
+        if ((i&3) === 0) {
+            tmp = arr[i/4];
+        }
+        out.push(tmp >>> 24);
+        tmp <<= 8;
+    }
+    return out;
+};
+
+export default displaySecret;
